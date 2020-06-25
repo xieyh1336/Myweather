@@ -1,8 +1,8 @@
 package com.example.myweather.db;
 
 import org.litepal.crud.DataSupport;
-
-class City extends DataSupport {
+//存放市的数据表
+public class City extends DataSupport {
     private int id;//每个实体类中应有的字段
     private String cityName;//市的名字
     private int cityCode;//市的代号
