@@ -23,6 +23,8 @@ import com.example.myweather.db.Province;
 import com.example.myweather.util.HttpUtil;
 import com.example.myweather.util.Utility;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
@@ -45,6 +47,8 @@ public class ChooseAreaFragment extends Fragment {
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private List<String> dataList=new ArrayList<>();
+    private String weatherId;
+    private int v=1;
 
     //省列表
     private List<Province> provinceList;
@@ -93,17 +97,50 @@ public class ChooseAreaFragment extends Fragment {
                     //加载县级数据
                     queryCounties();
                 }else if(currentLevel==LEVEL_COUNTY){
-                    String weatherId=countyList.get(position).getWeatherId();
+                    String weatherName=countyList.get(position).getCountyName();
+                    String Url="https://search.heweather.net/find?key=4e370c9c0f024db2934b9bae83930f17&location="+weatherName;
+                    showProgressDialog();
+                    HttpUtil.sendOkHttpRequest(Url, new Callback() {
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            final String responseText=response.body().string();
+                            try {
+                                JSONObject jsonObject=new JSONObject(responseText);
+                                JSONArray jsonArray=jsonObject.getJSONArray("HeWeather6");
+                                JSONObject jsonObject2=new JSONObject(jsonArray.getJSONObject(0).toString());
+                                JSONArray jsonArray1=jsonObject2.getJSONArray("basic");
+                                JSONObject jsonObject1=jsonArray1.getJSONObject(0);
+                                weatherId=jsonObject1.getString("cid");
+                                v=0;
+
+                            }catch (Exception e){
+                                v=0;
+                                e.printStackTrace();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            closeProgressDialog();
+                            Toast.makeText(getContext(),"加载失败",Toast.LENGTH_SHORT).show();
+                            v=0;
+                        }
+                    });
+                    while (v==1){
+                        //Toast.makeText(getContext(),"加载中",Toast.LENGTH_SHORT).show();
+                    }
                     if(getActivity() instanceof MainActivity){
                         Intent intent=new Intent(getActivity(),WeatherActivity.class);
                         intent.putExtra("weather_id",weatherId);
                         startActivity(intent);
                         getActivity().finish();
+                        v=0;
                     }else if(getActivity() instanceof WeatherActivity){
                         WeatherActivity activity=(WeatherActivity) getActivity();
                         activity.drawerLayout.closeDrawers();
                         activity.swipeRefresh.setRefreshing(true);
                         activity.requestWeather(weatherId);
+                        closeProgressDialog();
+                        v=0;
                     }
                 }
             }
@@ -123,6 +160,7 @@ public class ChooseAreaFragment extends Fragment {
         queryProvinces();
     }
 
+
     //查询全国所有的省，优先从数据库查询，如果没有查询到，再去服务器上查询
     private void queryProvinces(){
         titleText.setText("中国");
@@ -138,7 +176,7 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel=LEVEL_PROVINCE;
         }else {
             //向服务器发送请求
-            String address="http://guolin.tech/api/china";
+            String address="https://api.xiaohuwei.cn/test.php?type=province";
             queryFromServer(address,"province");
         }
     }
@@ -159,7 +197,7 @@ public class ChooseAreaFragment extends Fragment {
         }else {
             int provinceCode=selectedProvince.getProvinceCode();
             //向服务器发送请求
-            String address="http://guolin.tech/api/china/"+provinceCode;
+            String address="https://api.xiaohuwei.cn/test.php?type=city&pid="+provinceCode;
             queryFromServer(address,"city");
         }
     }
@@ -181,7 +219,7 @@ public class ChooseAreaFragment extends Fragment {
             int provinceCode=selectedProvince.getProvinceCode();
             int cityCode=selectedCity.getCityCode();
             //向服务器发送请求
-            String address="http://guolin.tech/api/china/"+provinceCode+"/"+cityCode;
+            String address="https://api.xiaohuwei.cn/test.php?type=county&id="+cityCode;
             queryFromServer(address,"county");
         }
     }

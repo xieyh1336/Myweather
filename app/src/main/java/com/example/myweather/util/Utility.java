@@ -18,13 +18,14 @@ public class Utility {
         if(!TextUtils.isEmpty(response)){
             try{
                 //解析数据
-                JSONArray allProvinces=new JSONArray(response);
+                JSONObject jsonObject=new JSONObject(response);
+                JSONArray allProvinces=jsonObject.getJSONArray("provincelist");
                 for(int i=0;i<allProvinces.length();i++){
                     JSONObject provinceObject=allProvinces.getJSONObject(i);
                     //新建实体表存放服务器返回来的数据
                     Province province=new Province();
-                    province.setProvinceName(provinceObject.getString("name"));
-                    province.setProvinceCode(provinceObject.getInt("id"));
+                    province.setProvinceName(provinceObject.getString("province"));
+                    province.setProvinceCode(provinceObject.getInt("pid"));
                     //存储到数据库中
                     province.save();
                 }
@@ -41,12 +42,13 @@ public class Utility {
         if(!TextUtils.isEmpty(response)){
             try{
                 //解析数据
-                JSONArray allCities=new JSONArray(response);
+                JSONObject jsonObject=new JSONObject(response);
+                JSONArray allCities=jsonObject.getJSONArray("citylist");
                 for(int i=0;i<allCities.length();i++){
                     JSONObject cityObject=allCities.getJSONObject(i);
                     //新建实体表存放服务器返回来的数据
                     City city=new City();
-                    city.setCityName(cityObject.getString("name"));
+                    city.setCityName(cityObject.getString("city"));
                     city.setCityCode(cityObject.getInt("id"));
                     city.setProvinceId(provinceId);
                     //存储到数据库中
@@ -65,13 +67,15 @@ public class Utility {
         if(!TextUtils.isEmpty(response)){
             try{
                 //解析数据
-                JSONArray allCounties=new JSONArray(response);
+                JSONObject jsonObject=new JSONObject(response);
+                JSONArray allCounties=jsonObject.getJSONArray("countylist");
                 for(int i=0;i<allCounties.length();i++){
                     JSONObject countyObject=allCounties.getJSONObject(i);
                     //新建实体表存放服务器返回来的数据
                     County county=new County();
-                    county.setCountyName(countyObject.getString("name"));
-                    county.setWeatherId(countyObject.getString("weather_id"));
+                    county.setCountyName(countyObject.getString("city"));
+                    county.setWeatherId(countyObject.getString("id"));
+                    county.setCountyNameen(countyObject.getString("en"));
                     county.setCityId(cityId);
                     //存储到数据库中
                     county.save();
@@ -88,12 +92,13 @@ public class Utility {
     public static Weather handleWeatherResponse(String response){
         try {
             JSONObject jsonObject=new JSONObject(response);
-            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather");
+            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather6");
             String weatherContent=jsonArray.getJSONObject(0).toString();
             return new Gson().fromJson(weatherContent,Weather.class);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+            //return new Gson().fromJson(weatherContent,Weather.class);
+    }catch (Exception e){
+        e.printStackTrace();
+    }
         return null;
     }
 }

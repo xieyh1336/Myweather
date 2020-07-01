@@ -31,10 +31,13 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     //新加的项目依赖
+
     implementation 'org.litepal.android:core:1.4.1'
     implementation 'com.squareup.okhttp3:okhttp:3.4.1'
-    implementation 'com.google.code.gson:gson:2.7'
     implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'//网络框架
+    implementation 'com.google.code.gson:gson:2.8.0'//json解析
+    implementation 'joda-time:joda-time:2.10'//时间框架
 
 
 }

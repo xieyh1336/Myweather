@@ -6,10 +6,22 @@ public class Now {
     @SerializedName("tmp")
     public String temperature;
 
-    @SerializedName("cond")
-    public More more;
-    public class More{
-        @SerializedName("txt")
-        public String info;
+    @SerializedName("cond_txt")
+    public String more;
+
+    public String getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(String temperature) {
+        this.temperature = temperature;
+    }
+
+    public String getMore() {
+        return more;
+    }
+
+    public void setMore(String more) {
+        this.more = more;
     }
 }
