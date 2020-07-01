@@ -96,9 +96,23 @@ public class Utility {
             String weatherContent=jsonArray.getJSONObject(0).toString();
             return new Gson().fromJson(weatherContent,Weather.class);
             //return new Gson().fromJson(weatherContent,Weather.class);
-    }catch (Exception e){
-        e.printStackTrace();
-    }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return null;
     }
+
+    //有缓存的转换，重写上述方法
+    public static Weather handleWeatherResponse(String response,int i){
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            String weatherContent=jsonObject.toString();
+            return new Gson().fromJson(weatherContent,Weather.class);
+            //return new Gson().fromJson(weatherContent,Weather.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

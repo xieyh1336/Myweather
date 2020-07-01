@@ -54,7 +54,7 @@ public class WeatherActivity extends AppCompatActivity {
     private Button navButton;
 
     public SwipeRefreshLayout swipeRefresh;
-    private String mWeatherId;
+    private String mWeatherId;//记录刷新时保存的id
 
     private ScrollView weatherLayout;
     private TextView titleCity;
@@ -67,9 +67,9 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView pm25Text;
 
     private ImageView bingPicImg;
-    SharedPreferences.Editor editor;
-    SharedPreferences.Editor editor1;
-    SharedPreferences.Editor editor2;
+    //SharedPreferences.Editor editor;
+    //SharedPreferences.Editor editor1;
+    //SharedPreferences.Editor editor2;
     //SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
     //SharedPreferences.Editor editor1=getSharedPreferences("suggestionList",MODE_PRIVATE).edit();
     //SharedPreferences.Editor editor2=getSharedPreferences("forecastList",MODE_PRIVATE).edit();
@@ -106,7 +106,7 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh=findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
 
-        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+
         /*SharedPreferences prefs1=getSharedPreferences("suggestionList",Context.MODE_PRIVATE);
         String json1=prefs1.getString("suggsetionListJson",null);
         List<Lifestyle> lifestyles;
@@ -120,8 +120,7 @@ public class WeatherActivity extends AppCompatActivity {
         forecasts=gson2.fromJson(json2,new TypeToken<List<Forecast>>(){}.getType());
 
 
-        //String weatherString=prefs.getString("weather",null);
-        Weather weather5=new Weather();
+
         weather5.setStatus(prefs.getString("status",null));
         weather5.air_now_city.setPm25(prefs.getString("pm25",null));
         weather5.air_now_city.setAqi(prefs.getString("aqi",null));
@@ -132,19 +131,21 @@ public class WeatherActivity extends AppCompatActivity {
         weather5.now.setMore((prefs.getString("more",null)));
         weather5.setSuggestionList(lifestyles);
         weather5.setForecastList(forecasts);*/
-
-        //if(weather5.status!=null){
+        SharedPreferences prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        String weatherString=prefs.getString("weather",null);
+        if(weatherString!=null){
             //有缓存时直接解析天气数据
-            //Weather weather5= Utility.handleWeatherResponse(weatherString);
-            //mWeatherId=weather5.basic.weatherId;
-            //showWeatherInfo(weather5);
-        //}else{
+            Weather weather5= Utility.handleWeatherResponse(weatherString,1);
+            mWeatherId=weather5.basic.weatherId;
+            showWeatherInfo(weather5);
+        }else{
             //无缓存时去服务器查询天气
             mWeatherId=getIntent().getStringExtra("weather_id");
             String weatherId=getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
+
             requestWeather(weatherId);
-        //}
+        }
 
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,6 +170,7 @@ public class WeatherActivity extends AppCompatActivity {
 
     //根据天气id请求城市天气信息
     public void requestWeather(final String weatherId){
+        mWeatherId=weatherId;
         //请求basic和aqi
         String basicUrl="https://free-api.heweather.net/s6/air/now?location="+weatherId+"&key=4e370c9c0f024db2934b9bae83930f17";
         HttpUtil.sendOkHttpRequest(basicUrl, new Callback() {
@@ -385,6 +387,11 @@ public class WeatherActivity extends AppCompatActivity {
             //weather.forecastList=weather4.forecastList;
         }
         if(i>=4){
+            Gson gson=new Gson();
+            String jsonStr=gson.toJson(weather);
+            SharedPreferences.Editor editor= PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+            editor.putString("weather",jsonStr);
+            editor.apply();
             //editor.apply();
             //editor1.apply();
             //editor2.apply();
