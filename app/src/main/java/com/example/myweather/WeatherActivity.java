@@ -399,6 +399,7 @@ public class WeatherActivity extends AppCompatActivity {
             //showWeatherInfo(weather11,weather22,weather33,weather44);
             swipeRefresh.setRefreshing(false);
         }
+        loadBingPic();
     }
 
     //处理并展示Weather实体类中的数据(重写)
@@ -485,11 +486,12 @@ public class WeatherActivity extends AppCompatActivity {
         }else{
             Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
         }
+        loadBingPic();
     }
 
     //加载必应每日一图
     private void loadBingPic(){
-        String requsetBingPic="Http://guolin.tech/api/bing_pic";
+        String requsetBingPic="http://guolin.tech/api/bing_pic";
         HttpUtil.sendOkHttpRequest(requsetBingPic, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
